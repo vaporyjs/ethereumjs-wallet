@@ -27,12 +27,12 @@
   },
   "homepage": "https://github.com/vaporyjs/vaporyjs-wallet",
   "dependencies": {
-    "aes-js": "^3.1.0",
-    "bs58check": "^2.1.1",
+    "aes-js": "3.1.0",
+    "bs58check": "2.1.1",
     "vaporyjs-util": "^5.1.5",
-    "hdkey": "^0.8.0",
-    "safe-buffer": "^5.1.1",
-    "scrypt.js": "^0.2.0",
+    "hdkey": "0.8.0",
+    "safe-buffer": "5.1.1",
+    "scrypt.js": "0.3.0",
     "utf8": "^3.0.0",
     "uuid": "^3.2.1"
   },
