@@ -1,5 +1,5 @@
 var Buffer = require('safe-buffer').Buffer
-var ethUtil = require('ethereumjs-util')
+var vapUtil = require('vaporyjs-util')
 var crypto = require('crypto')
 var scryptsy = require('scrypt.js')
 var uuidv4 = require('uuid/v4')
@@ -20,11 +20,11 @@ var Wallet = function (priv, pub) {
     throw new Error('Cannot supply both a private and a public key to the constructor')
   }
 
-  if (priv && !ethUtil.isValidPrivate(priv)) {
+  if (priv && !vapUtil.isValidPrivate(priv)) {
     throw new Error('Private key does not satisfy the curve requirements (ie. it is invalid)')
   }
 
-  if (pub && !ethUtil.isValidPublic(pub)) {
+  if (pub && !vapUtil.isValidPublic(pub)) {
     throw new Error('Invalid public key')
   }
 
@@ -42,7 +42,7 @@ Object.defineProperty(Wallet.prototype, 'privKey', {
 Object.defineProperty(Wallet.prototype, 'pubKey', {
   get: function () {
     if (!this._pubKey) {
-      this._pubKey = ethUtil.privateToPublic(this.privKey)
+      this._pubKey = vapUtil.privateToPublic(this.privKey)
     }
     return this._pubKey
   }
@@ -50,10 +50,10 @@ Object.defineProperty(Wallet.prototype, 'pubKey', {
 
 Wallet.generate = function (icapDirect) {
   if (icapDirect) {
-    var max = new ethUtil.BN('088f924eeceeda7fe92e1f5b0fffffffffffffff', 16)
+    var max = new vapUtil.BN('088f924eeceeda7fe92e1f5b0fffffffffffffff', 16)
     while (true) {
       var privKey = crypto.randomBytes(32)
-      if (new ethUtil.BN(ethUtil.privateToAddress(privKey)).lte(max)) {
+      if (new vapUtil.BN(vapUtil.privateToAddress(privKey)).lte(max)) {
         return new Wallet(privKey)
       }
     }
@@ -69,7 +69,7 @@ Wallet.generateVanityAddress = function (pattern) {
 
   while (true) {
     var privKey = crypto.randomBytes(32)
-    var address = ethUtil.privateToAddress(privKey)
+    var address = vapUtil.privateToAddress(privKey)
 
     if (pattern.test(address.toString('hex'))) {
       return new Wallet(privKey)
@@ -82,7 +82,7 @@ Wallet.prototype.getPrivateKey = function () {
 }
 
 Wallet.prototype.getPrivateKeyString = function () {
-  return ethUtil.bufferToHex(this.getPrivateKey())
+  return vapUtil.bufferToHex(this.getPrivateKey())
 }
 
 Wallet.prototype.getPublicKey = function () {
@@ -90,22 +90,22 @@ Wallet.prototype.getPublicKey = function () {
 }
 
 Wallet.prototype.getPublicKeyString = function () {
-  return ethUtil.bufferToHex(this.getPublicKey())
+  return vapUtil.bufferToHex(this.getPublicKey())
 }
 
 Wallet.prototype.getAddress = function () {
-  return ethUtil.publicToAddress(this.pubKey)
+  return vapUtil.publicToAddress(this.pubKey)
 }
 
 Wallet.prototype.getAddressString = function () {
-  return ethUtil.bufferToHex(this.getAddress())
+  return vapUtil.bufferToHex(this.getAddress())
 }
 
 Wallet.prototype.getChecksumAddressString = function () {
-  return ethUtil.toChecksumAddress(this.getAddressString())
+  return vapUtil.toChecksumAddress(this.getAddressString())
 }
 
-// https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition
+// https://github.com/vaporyco/wiki/wiki/Web3-Secret-Storage-Definition
 Wallet.prototype.toV3 = function (password, opts) {
   assert(this._privKey, 'This is a public key only wallet')
 
@@ -141,7 +141,7 @@ Wallet.prototype.toV3 = function (password, opts) {
 
   var ciphertext = Buffer.concat([ cipher.update(this.privKey), cipher.final() ])
 
-  var mac = ethUtil.sha3(Buffer.concat([ derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex') ]))
+  var mac = vapUtil.sha3(Buffer.concat([ derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex') ]))
 
   return {
     version: 3,
@@ -188,7 +188,7 @@ Wallet.prototype.toV3String = function (password, opts) {
 
 Wallet.fromPublicKey = function (pub, nonStrict) {
   if (nonStrict) {
-    pub = ethUtil.importPublic(pub)
+    pub = vapUtil.importPublic(pub)
   }
   return new Wallet(null, pub)
 }
@@ -196,7 +196,7 @@ Wallet.fromPublicKey = function (pub, nonStrict) {
 Wallet.fromExtendedPublicKey = function (pub) {
   assert(pub.slice(0, 4) === 'xpub', 'Not an extended public key')
   pub = bs58check.decode(pub).slice(45)
-  // Convert to an Ethereum public key
+  // Convert to an Vapory public key
   return Wallet.fromPublicKey(pub, true)
 }
 
@@ -211,7 +211,7 @@ Wallet.fromExtendedPrivateKey = function (priv) {
   return Wallet.fromPrivateKey(tmp.slice(46))
 }
 
-// https://github.com/ethereum/go-ethereum/wiki/Passphrase-protected-key-store-spec
+// https://github.com/vaporyco/go-vapory/wiki/Passphrase-protected-key-store-spec
 Wallet.fromV1 = function (input, password) {
   assert(typeof password === 'string')
   var json = (typeof input === 'object') ? input : JSON.parse(input)
@@ -229,13 +229,13 @@ Wallet.fromV1 = function (input, password) {
 
   var ciphertext = Buffer.from(json.Crypto.CipherText, 'hex')
 
-  var mac = ethUtil.sha3(Buffer.concat([ derivedKey.slice(16, 32), ciphertext ]))
+  var mac = vapUtil.sha3(Buffer.concat([ derivedKey.slice(16, 32), ciphertext ]))
 
   if (mac.toString('hex') !== json.Crypto.MAC) {
     throw new Error('Key derivation failed - possibly wrong passphrase')
   }
 
-  var decipher = crypto.createDecipheriv('aes-128-cbc', ethUtil.sha3(derivedKey.slice(0, 16)).slice(0, 16), Buffer.from(json.Crypto.IV, 'hex'))
+  var decipher = crypto.createDecipheriv('aes-128-cbc', vapUtil.sha3(derivedKey.slice(0, 16)).slice(0, 16), Buffer.from(json.Crypto.IV, 'hex'))
   var seed = decipherBuffer(decipher, ciphertext)
 
   return new Wallet(seed)
@@ -270,7 +270,7 @@ Wallet.fromV3 = function (input, password, nonStrict) {
 
   var ciphertext = Buffer.from(json.crypto.ciphertext, 'hex')
 
-  var mac = ethUtil.sha3(Buffer.concat([ derivedKey.slice(16, 32), ciphertext ]))
+  var mac = vapUtil.sha3(Buffer.concat([ derivedKey.slice(16, 32), ciphertext ]))
   if (mac.toString('hex') !== json.crypto.mac) {
     throw new Error('Key derivation failed - possibly wrong passphrase')
   }
@@ -282,10 +282,10 @@ Wallet.fromV3 = function (input, password, nonStrict) {
 }
 
 /*
- * Based on https://github.com/ethereum/pyethsaletool/blob/master/pyethsaletool.py
- * JSON fields: encseed, ethaddr, btcaddr, email
+ * Based on https://github.com/vaporyco/pyvapsaletool/blob/master/pyvapsaletool.py
+ * JSON fields: encseed, vapaddr, btcaddr, email
  */
-Wallet.fromEthSale = function (input, password) {
+Wallet.fromVapSale = function (input, password) {
   assert(typeof password === 'string')
   var json = (typeof input === 'object') ? input : JSON.parse(input)
 
@@ -300,8 +300,8 @@ Wallet.fromEthSale = function (input, password) {
   var decipher = crypto.createDecipheriv('aes-128-cbc', derivedKey, encseed.slice(0, 16))
   var seed = decipherBuffer(decipher, encseed.slice(16))
 
-  var wallet = new Wallet(ethUtil.sha3(seed))
-  if (wallet.getAddress().toString('hex') !== json.ethaddr) {
+  var wallet = new Wallet(vapUtil.sha3(seed))
+  if (wallet.getAddress().toString('hex') !== json.vapaddr) {
     throw new Error('Decoded key mismatch - possibly wrong passphrase')
   }
   return wallet

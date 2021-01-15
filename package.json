@@ -1,7 +1,8 @@
 {
-  "name": "ethereumjs-wallet",
+  "name": "vaporyjs-wallet",
+  "namespace": "vaporyjs",
   "version": "0.6.0",
-  "description": "Utilities for handling Ethereum keys",
+  "description": "Utilities for handling Vapory keys",
   "main": "index.js",
   "scripts": {
     "coverage": "istanbul cover _mocha",
@@ -12,23 +13,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ethereumjs/ethereumjs-wallet.git"
+    "url": "https://github.com/vaporyjs/vaporyjs-wallet.git"
   },
   "keywords": [
-    "ethereum",
+    "vapory",
     "wallets",
     "keys"
   ],
   "author": "Alex Beregszaszi <alex@rtfs.hu>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ethereumjs/ethereumjs-wallet/issues"
+    "url": "https://github.com/vaporyjs/vaporyjs-wallet/issues"
   },
-  "homepage": "https://github.com/ethereumjs/ethereumjs-wallet",
+  "homepage": "https://github.com/vaporyjs/vaporyjs-wallet",
   "dependencies": {
     "aes-js": "^3.1.0",
     "bs58check": "^2.1.1",
-    "ethereumjs-util": "^5.1.4",
+    "vaporyjs-util": "^5.1.5",
     "hdkey": "^0.8.0",
     "safe-buffer": "^5.1.1",
     "scrypt.js": "^0.2.0",

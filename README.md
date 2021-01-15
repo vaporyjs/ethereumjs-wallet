@@ -1,21 +1,21 @@
-# ethereumjs-wallet
+# vaporyjs-wallet
 
-[![NPM Package](https://img.shields.io/npm/v/ethereumjs-wallet.svg?style=flat-square)](https://www.npmjs.org/package/ethereumjs-wallet)
-[![Build Status](https://travis-ci.org/ethereumjs/ethereumjs-wallet.svg?branch=master)](https://travis-ci.org/ethereumjs/ethereumjs-wallet)
-[![Coverage Status](https://img.shields.io/coveralls/ethereumjs/ethereumjs-wallet.svg?style=flat-square)](https://coveralls.io/r/ethereumjs/ethereumjs-wallet)
-[![Gitter](https://img.shields.io/gitter/room/ethereum/ethereumjs-lib.svg?style=flat-square)](https://gitter.im/ethereum/ethereumjs-lib) or #ethereumjs on freenode
+[![NPM Package](https://img.shields.io/npm/v/vaporyjs-wallet.svg?style=flat-square)](https://www.npmjs.org/package/vaporyjs-wallet)
+[![Build Status](https://travis-ci.org/vaporyjs/vaporyjs-wallet.svg?branch=master)](https://travis-ci.org/vaporyjs/vaporyjs-wallet)
+[![Coverage Status](https://img.shields.io/coveralls/vaporyjs/vaporyjs-wallet.svg?style=flat-square)](https://coveralls.io/r/vaporyjs/vaporyjs-wallet)
+[![Gitter](https://img.shields.io/gitter/room/vapory/vaporyjs-lib.svg?style=flat-square)](https://gitter.im/vapory/vaporyjs-lib) or #vaporyjs on freenode
 
 A lightweight wallet implementation. At the moment it supports key creation and conversion between various formats.
 
 It is complemented by the following packages:
-- [ethereumjs-tx](https://github.com/ethereumjs/ethereumjs-tx) to sign transactions
-- [ethereumjs-icap](https://github.com/ethereumjs/ethereumjs-icap) to manipulate ICAP addresses
+- [vaporyjs-tx](https://github.com/vaporycojs/vaporyjs-tx) to sign transactions
+- [vaporyjs-icap](https://github.com/vaporycojs/vaporyjs-icap) to manipulate ICAP addresses
 - [store.js](https://github.com/marcuswestin/store.js) to use browser storage
 
 Motivations are:
 - be lightweight
 - work in a browser
-- use a single, maintained version of crypto library (and that should be in line with `ethereumjs-util` and `ethereumjs-tx`)
+- use a single, maintained version of crypto library (and that should be in line with `vaporyjs-util` and `vaporyjs-tx`)
 - support import/export between various wallet formats
 - support BIP32 HD keys
 
@@ -33,37 +33,37 @@ Constructors:
 * `fromExtendedPrivateKey(input)` - create an instance based on a BIP32 extended private key (xprv)
 * `fromPublicKey(input, [nonStrict])` - create an instance based on a public key (certain methods will not be available)
 * `fromExtendedPublicKey(input)` - create an instance based on a BIP32 extended public key (xpub)
-* `fromV1(input, password)` - import a wallet (Version 1 of the Ethereum wallet format)
-* `fromV3(input, password, [nonStrict])` - import a wallet (Version 3 of the Ethereum wallet format). Set `nonStrict` true to accept files with mixed-caps.
-* `fromEthSale(input, password)` - import an Ethereum Pre Sale wallet
+* `fromV1(input, password)` - import a wallet (Version 1 of the Vapory wallet format)
+* `fromV3(input, password, [nonStrict])` - import a wallet (Version 3 of the Vapory wallet format). Set `nonStrict` true to accept files with mixed-caps.
+* `fromVapSale(input, password)` - import an Vapory Pre Sale wallet
 
-For the V1, V3 and EthSale formats the input is a JSON serialized string. All these formats require a password.
+For the V1, V3 and VapSale formats the input is a JSON serialized string. All these formats require a password.
 
-Note: `fromPublicKey()` only accepts uncompressed Ethereum-style public keys, unless the `nonStrict` flag is set to true.
+Note: `fromPublicKey()` only accepts uncompressed Vapory-style public keys, unless the `nonStrict` flag is set to true.
 
 Instance methods:
 
 * `getPrivateKey()` - return the private key
 * `getPublicKey()` - return the public key
 * `getAddress()` - return the address
-* `getChecksumAddressString()` - return the [address with checksum](https://github.com/ethereum/EIPs/issues/55)
+* `getChecksumAddressString()` - return the [address with checksum](https://github.com/vaporyco/EIPs/issues/55)
 * `getV3Filename([timestamp])` - return the suggested filename for V3 keystores
-* `toV3(password, [options])` - return the wallet as a JSON string (Version 3 of the Ethereum wallet format)
+* `toV3(password, [options])` - return the wallet as a JSON string (Version 3 of the Vapory wallet format)
 
 All of the above instance methods return a Buffer or JSON. Use the `String` suffixed versions for a string output, such as `getPrivateKeyString()`.
 
-Note: `getPublicKey()` only returns uncompressed Ethereum-style public keys.
+Note: `getPublicKey()` only returns uncompressed Vapory-style public keys.
 
 ## Thirdparty API
 
 Importing various third party wallets is possible through the `thirdparty` submodule:
 
-`var thirdparty = require('ethereumjs-wallet/thirdparty')`
+`var thirdparty = require('vaporyjs-wallet/thirdparty')`
 
 Constructors:
 
-* `fromEtherCamp(passphrase)` - import a brain wallet used by Ether.Camp
-* `fromEtherWallet(input, password)` - import a wallet generated by EtherWallet
+* `fromVaporCamp(passphrase)` - import a brain wallet used by Vapor.Camp
+* `fromVaporWallet(input, password)` - import a wallet generated by VaporWallet
 * `fromKryptoKit(seed)` - import a wallet from a KryptoKit seed
 * `fromQuorumWallet(passphrase, userid)` - import a brain wallet used by Quorum Wallet
 
@@ -71,7 +71,7 @@ Constructors:
 
 To use BIP32 HD wallets, first include the `hdkey` submodule:
 
-`var hdkey = require('ethereumjs-wallet/hdkey')`
+`var hdkey = require('vaporyjs-wallet/hdkey')`
 
 Constructors:
 
@@ -93,7 +93,7 @@ Instance methods:
 The Wallet can be easily plugged into [provider-engine](https://github.com/metamask/provider-engine) to provide signing:
 
 ```js
-const WalletSubprovider = require('ethereumjs-wallet/provider-engine')
+const WalletSubprovider = require('vaporyjs-wallet/provider-engine')
 
 <engine>.addProvider(new WalletSubprovider(<wallet instance>))
 ```
@@ -121,7 +121,7 @@ For `scrypt`:
 - `r` - Block size for the underlying hash. Defaults to 8.
 - `p` - Parallelization factor. Defaults to 1.
 
-The following settings are favoured by the Go Ethereum implementation and we default to the same:
+The following settings are favoured by the Go Vapory implementation and we default to the same:
 - `kdf`: `scrypt`
 - `dklen`: `32`
 - `n`: `262144`
